@@ -304,7 +304,7 @@ input[type="number"]:focus {
 .total-badge {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--accent);
+  transition: color 0.4s ease;
 }
 
 .results-meta {
@@ -330,9 +330,9 @@ input[type="number"]:focus {
 }
 
 .result-row .die-type { color: var(--muted); }
-.result-row .die-val { font-weight: 700; color: var(--text); }
-.result-row .die-val.max { color: #ffd700; }
-.result-row .die-val.min { color: var(--accent2); }
+.result-row .die-val { font-weight: 700; color: #60a5fa; }
+.result-row .die-val.max { color: #4ade80; }
+.result-row .die-val.min { color: #f87171; }
 
 /* Multi-roll stats */
 .stats-table {

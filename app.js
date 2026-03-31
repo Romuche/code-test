@@ -83,11 +83,34 @@ function rollOnce() {
   }, 500);
 }
 
+function scoreColor(total, theoryMin, theoryMax) {
+  if (theoryMax === theoryMin) return '#60a5fa';
+  const t = (total - theoryMin) / (theoryMax - theoryMin); // 0..1
+  // red(0) → blue(0.5) → green(1)
+  if (t <= 0.5) {
+    const r = Math.round(248 + (96 - 248) * (t * 2));
+    const g = Math.round(113 + (165 - 113) * (t * 2));
+    const b = Math.round(113 + (250 - 113) * (t * 2));
+    return `rgb(${r},${g},${b})`;
+  } else {
+    const u = (t - 0.5) * 2;
+    const r = Math.round(96 + (74 - 96) * u);
+    const g = Math.round(165 + (222 - 165) * u);
+    const b = Math.round(250 + (128 - 250) * u);
+    return `rgb(${r},${g},${b})`;
+  }
+}
+
 function showSingleResults(results, total) {
   const section = document.getElementById('singleResults');
   section.classList.add('visible');
 
-  document.getElementById('singleTotal').textContent = total;
+  const theoryMin = results.length;
+  const theoryMax = results.reduce((s, r) => s + r.faces, 0);
+  const totalEl = document.getElementById('singleTotal');
+  totalEl.textContent = total;
+  totalEl.style.color = scoreColor(total, theoryMin, theoryMax);
+
   document.getElementById('singleMeta').textContent =
     `Total of ${results.length} ${results.length === 1 ? 'die' : 'dice'}`;
 
