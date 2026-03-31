@@ -5,6 +5,8 @@ function rollDie(faces) {
 function rollOnce() {
   if (dice.length === 0) return;
 
+  document.getElementById('multiResults').classList.remove('visible');
+
   const rollBtn = document.getElementById('rollBtn');
   rollBtn.disabled = true;
 
@@ -35,25 +37,11 @@ function rollOnce() {
   }, 500);
 }
 
-function scoreColor(total, theoryMin, theoryMax) {
-  if (theoryMax === theoryMin) return '#60a5fa';
-  const t = (total - theoryMin) / (theoryMax - theoryMin);
-  if (t <= 0.5) {
-    const r = Math.round(248 + (96 - 248) * (t * 2));
-    const g = Math.round(113 + (165 - 113) * (t * 2));
-    const b = Math.round(113 + (250 - 113) * (t * 2));
-    return `rgb(${r},${g},${b})`;
-  } else {
-    const u = (t - 0.5) * 2;
-    const r = Math.round(96 + (74 - 96) * u);
-    const g = Math.round(165 + (222 - 165) * u);
-    const b = Math.round(250 + (128 - 250) * u);
-    return `rgb(${r},${g},${b})`;
-  }
-}
-
 function showSingleResults(results, total) {
   const section = document.getElementById('singleResults');
+  section.classList.remove('visible');
+  // force reflow so animation replays
+  void section.offsetWidth;
   section.classList.add('visible');
 
   const theoryMin = results.length;
@@ -83,6 +71,8 @@ function rollMulti() {
   const count = parseInt(document.getElementById('multiCount').value);
   if (!count || count < 1) return;
 
+  document.getElementById('singleResults').classList.remove('visible');
+
   const totals = [];
   for (let i = 0; i < count; i++) {
     let sum = 0;
@@ -109,16 +99,20 @@ function rollMulti() {
   const theoryMin = dice.length;
   const theoryMax = dice.reduce((s, d) => s + d.faces, 0);
 
-  showMultiResults({ count, min, max, avg, median, std, modeVal, modeCount, theoryMin, theoryMax });
+  showMultiResults({ count, min, max, avg, median, std, modeVal, modeCount, theoryMin, theoryMax, freq });
   addHistory('multi', null, null, { count, min, max, avg, median, std, modeVal, modeCount, theoryMin, theoryMax, freq });
 }
 
-function showMultiResults({ count, min, max, avg, median, std, modeVal, modeCount, theoryMin, theoryMax }) {
+function showMultiResults({ count, min, max, avg, median, std, modeVal, modeCount, theoryMin, theoryMax, freq }) {
   const section = document.getElementById('multiResults');
+  section.classList.remove('visible');
+  void section.offsetWidth;
   section.classList.add('visible');
 
   document.getElementById('multiMeta').textContent =
     `${count.toLocaleString()} simulated rolls with ${dice.length} ${dice.length === 1 ? 'die' : 'dice'}`;
+
+  document.getElementById('multiChart').innerHTML = renderDistributionChart(freq, theoryMin, theoryMax);
 
   document.getElementById('statsBody').innerHTML = `
     <tr><td>Min rolled</td><td class="highlight">${min}</td></tr>

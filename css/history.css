@@ -64,18 +64,4 @@ details[open] .hist-chevron {
   gap: 12px;
 }
 
-/* Distribution chart */
-.dist-chart {
-  width: 100%;
-  height: 76px;
-  display: block;
-  overflow: visible;
-}
-
-.dist-chart text {
-  fill: var(--muted);
-  font-size: 10px;
-  font-family: 'Segoe UI', system-ui, sans-serif;
-}
-
 .history-empty { color: var(--muted); font-size: 0.9rem; }

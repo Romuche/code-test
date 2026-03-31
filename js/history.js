@@ -19,44 +19,6 @@ function clearHistory() {
   renderHistory();
 }
 
-function renderDistributionChart(freq, theoryMin, theoryMax) {
-  const entries = Object.entries(freq)
-    .map(([v, c]) => ({ v: parseInt(v), c }))
-    .sort((a, b) => a.v - b.v);
-
-  if (entries.length === 0) return '';
-
-  const W = 400, H = 60;
-  const maxCount = Math.max(...entries.map(e => e.c));
-  const n = entries.length;
-  const gap = n > 1 ? 1 : 0;
-  const barW = (W - gap * (n - 1)) / n;
-
-  const bars = entries.map((e, i) => {
-    const barH = Math.max(1, (e.c / maxCount) * H);
-    const x = i * (barW + gap);
-    const y = H - barH;
-    const color = scoreColor(e.v, theoryMin, theoryMax);
-    return `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${barW.toFixed(2)}" height="${barH.toFixed(2)}" fill="${color}" rx="1"/>`;
-  }).join('');
-
-  // X-axis labels: show min, mid, max
-  const mid = entries[Math.floor(n / 2)];
-  const labelY = H + 12;
-  const labels = [
-    `<text x="0" y="${labelY}" text-anchor="start">${entries[0].v}</text>`,
-    `<text x="${W / 2}" y="${labelY}" text-anchor="middle">${mid.v}</text>`,
-    `<text x="${W}" y="${labelY}" text-anchor="end">${entries[n - 1].v}</text>`,
-  ].join('');
-
-  return `
-    <svg class="dist-chart" viewBox="0 0 ${W} ${H + 16}" preserveAspectRatio="none">
-      ${bars}
-      ${labels}
-    </svg>
-  `;
-}
-
 function renderStatsRows({ min, max, avg, median, std, modeVal, modeCount, theoryMin, theoryMax }) {
   return `
     <table class="stats-table">

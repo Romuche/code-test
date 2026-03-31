@@ -66,3 +66,22 @@
 .stats-table tr:hover td { background: var(--surface2); }
 
 .highlight { color: var(--accent); font-weight: 700; }
+
+/* Distribution chart */
+.dist-chart-wrapper {
+  margin-bottom: 16px;
+}
+
+.dist-chart {
+  width: 100%;
+  height: 60px;
+  display: block;
+}
+
+.dist-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
