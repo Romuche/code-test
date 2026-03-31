@@ -33,7 +33,10 @@
 
     <!-- Dice Tray -->
     <div class="card">
-      <div class="card-title">Your Dice Pool</div>
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+        Your Dice Pool
+        <button class="btn-clear" onclick="clearDice()">Clear Dice</button>
+      </div>
       <div class="dice-tray" id="diceTray">
         <span class="dice-empty">No dice yet — add some above.</span>
       </div>
@@ -50,7 +53,6 @@
           <label>rolls</label>
           <button class="btn-multi" id="multiBtn" onclick="rollMulti()">Roll</button>
         </div>
-        <button class="btn-clear" onclick="clearDice()">Clear All</button>
       </div>
     </div>
 
