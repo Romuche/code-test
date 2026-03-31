@@ -1,51 +1,3 @@
-let dice = []; // { id, faces }
-let nextId = 1;
-let history = [];
-
-function addDie(faces) {
-  dice.push({ id: nextId++, faces });
-  renderTray();
-}
-
-function addCustomDie() {
-  const input = document.getElementById('customFaces');
-  const faces = parseInt(input.value);
-  if (!faces || faces < 2) { input.focus(); return; }
-  addDie(faces);
-}
-
-function removeDie(id) {
-  dice = dice.filter(d => d.id !== id);
-  renderTray();
-}
-
-function clearDice() {
-  dice = [];
-  renderTray();
-  document.getElementById('singleResults').classList.remove('visible');
-  document.getElementById('multiResults').classList.remove('visible');
-}
-
-function renderTray() {
-  const tray = document.getElementById('diceTray');
-  if (dice.length === 0) {
-    tray.innerHTML = '<span class="dice-empty">No dice yet — add some above.</span>';
-    return;
-  }
-  tray.innerHTML = dice.map(d => `
-    <div class="die-chip">
-      <div class="die-face" id="die-${d.id}">
-        <span class="die-label">D${d.faces}</span>
-        ?
-      </div>
-      <div class="die-chip-label">D${d.faces}</div>
-      <div class="die-chip-actions">
-        <button class="btn btn-danger" onclick="removeDie(${d.id})">Remove</button>
-      </div>
-    </div>
-  `).join('');
-}
-
 function rollDie(faces) {
   return Math.floor(Math.random() * faces) + 1;
 }
@@ -85,8 +37,7 @@ function rollOnce() {
 
 function scoreColor(total, theoryMin, theoryMax) {
   if (theoryMax === theoryMin) return '#60a5fa';
-  const t = (total - theoryMin) / (theoryMax - theoryMin); // 0..1
-  // red(0) → blue(0.5) → green(1)
+  const t = (total - theoryMin) / (theoryMax - theoryMin);
   if (t <= 0.5) {
     const r = Math.round(248 + (96 - 248) * (t * 2));
     const g = Math.round(113 + (165 - 113) * (t * 2));
@@ -180,55 +131,3 @@ function showMultiResults({ count, min, max, avg, median, std, modeVal, modeCoun
     <tr><td>Theoretical max</td><td style="color:var(--muted)">${theoryMax}</td></tr>
   `;
 }
-
-function addHistory(type, results, total, multiData) {
-  const now = new Date();
-  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-  if (type === 'single') {
-    const breakdown = results.map(r => `<strong>${r.value}</strong> (D${r.faces})`).join(' + ');
-    history.unshift({ time, type: 'single', breakdown, total });
-  } else {
-    const summary = dice.map(d => `D${d.faces}`).join('+');
-    history.unshift({ time, type: 'multi', summary, count: multiData.count, avg: multiData.avg });
-  }
-
-  if (history.length > 20) history.pop();
-  renderHistory();
-}
-
-function clearHistory() {
-  history = [];
-  renderHistory();
-}
-
-function renderHistory() {
-  const list = document.getElementById('historyList');
-  if (history.length === 0) {
-    list.innerHTML = '<span class="history-empty">No rolls yet.</span>';
-    return;
-  }
-  list.innerHTML = history.map(h => {
-    if (h.type === 'single') {
-      return `
-        <div class="history-item">
-          <span class="hist-time">${h.time}</span>
-          <span class="hist-desc">${h.breakdown}</span>
-          <span class="hist-total">${h.total}</span>
-        </div>
-      `;
-    } else {
-      return `
-        <div class="history-item">
-          <span class="hist-time">${h.time}</span>
-          <span class="hist-desc">${h.count}x [${h.summary}]</span>
-          <span class="hist-total">avg ${h.avg.toFixed(1)}</span>
-        </div>
-      `;
-    }
-  }).join('');
-}
-
-document.getElementById('customFaces').addEventListener('keydown', e => {
-  if (e.key === 'Enter') addCustomDie();
-});

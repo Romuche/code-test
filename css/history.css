@@ -1,0 +1,24 @@
+/* History */
+.history-list {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+}
+
+.history-item .hist-time { color: var(--muted); font-size: 0.78rem; min-width: 50px; }
+.history-item .hist-desc { flex: 1; color: var(--muted); }
+.history-item .hist-total { font-weight: 700; color: var(--accent); }
+
+.history-empty { color: var(--muted); font-size: 0.9rem; }

@@ -1,0 +1,76 @@
+/* Dice tray */
+.dice-tray {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-height: 60px;
+}
+
+.dice-empty {
+  color: var(--muted);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.die-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.die-face {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  cursor: default;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.die-face.rolling {
+  animation: shake 0.5s ease-in-out;
+  border-color: var(--accent);
+}
+
+.die-face.rolled {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, #1e2040, #252850);
+}
+
+.die-face .die-label {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.die-chip-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.die-chip-actions {
+  display: flex;
+  gap: 4px;
+}
+
+@keyframes shake {
+  0%   { transform: rotate(0deg) scale(1); }
+  20%  { transform: rotate(-8deg) scale(1.05); }
+  40%  { transform: rotate(8deg) scale(1.05); }
+  60%  { transform: rotate(-5deg) scale(1.02); }
+  80%  { transform: rotate(5deg) scale(1.02); }
+  100% { transform: rotate(0deg) scale(1); }
+}
