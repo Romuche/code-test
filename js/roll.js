@@ -110,7 +110,7 @@ function rollMulti() {
   const theoryMax = dice.reduce((s, d) => s + d.faces, 0);
 
   showMultiResults({ count, min, max, avg, median, std, modeVal, modeCount, theoryMin, theoryMax });
-  addHistory('multi', null, null, { count, min, max, avg });
+  addHistory('multi', null, null, { count, min, max, avg, median, std, modeVal, modeCount, theoryMin, theoryMax, freq });
 }
 
 function showMultiResults({ count, min, max, avg, median, std, modeVal, modeCount, theoryMin, theoryMax }) {
