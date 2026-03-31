@@ -477,10 +477,15 @@ input[type="number"]:focus {
     text-align: center;
   }
 
-  .btn-clear {
+  .roll-controls .btn-clear {
     width: 100%;
     margin-left: 0;
     text-align: center;
+  }
+
+  .card-title .btn-clear {
+    padding: 4px 10px;
+    font-size: 0.78rem;
   }
 
   .results-grid {
