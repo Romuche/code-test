@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dice Roll Simulator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d2e;
+      --surface2: #252840;
+      --accent: #6c63ff;
+      --accent2: #ff6584;
+      --text: #e8e8f0;
+      --muted: #7a7a9a;
+      --border: #2e3250;
+      --success: #4caf91;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 32px;
+      font-size: 0.95rem;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* Add dice section */
+    .add-dice-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .preset-btn {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+
+    .preset-btn:hover {
+      border-color: var(--accent);
+      background: #2a2d4a;
+    }
+
+    .separator {
+      width: 1px;
+      height: 36px;
+      background: var(--border);
+    }
+
+    .custom-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .custom-row label {
+      font-size: 0.88rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    input[type="number"] {
+      width: 80px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--accent);
+    }
+
+    .btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: #5a52e0; }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--accent2);
+      border: 1px solid var(--accent2);
+      padding: 4px 10px;
+      font-size: 0.8rem;
+    }
+
+    .btn-danger:hover { background: rgba(255,101,132,0.1); }
+
+    /* Dice tray */
+    .dice-tray {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-height: 60px;
+    }
+
+    .dice-empty {
+      color: var(--muted);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .die-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .die-face {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      cursor: default;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .die-face.rolling {
+      animation: shake 0.5s ease-in-out;
+      border-color: var(--accent);
+    }
+
+    .die-face.rolled {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, #1e2040, #252850);
+    }
+
+    .die-face .die-label {
+      position: absolute;
+      top: 3px;
+      right: 5px;
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .die-chip-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .die-chip-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    @keyframes shake {
+      0%   { transform: rotate(0deg) scale(1); }
+      20%  { transform: rotate(-8deg) scale(1.05); }
+      40%  { transform: rotate(8deg) scale(1.05); }
+      60%  { transform: rotate(-5deg) scale(1.02); }
+      80%  { transform: rotate(5deg) scale(1.02); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+
+    /* Roll controls */
+    .roll-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-roll {
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      color: #fff;
+      font-size: 1rem;
+      padding: 10px 28px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.15s;
+      box-shadow: 0 4px 15px rgba(108,99,255,0.3);
+    }
+
+    .btn-roll:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,99,255,0.4); }
+    .btn-roll:active { transform: translateY(0); }
+    .btn-roll:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .multi-roll-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .multi-roll-group label {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .btn-multi {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-multi:hover { border-color: var(--accent2); }
+    .btn-multi:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-clear {
+      margin-left: auto;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.15s;
+    }
+
+    .btn-clear:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    /* Results */
+    .results-section { display: none; }
+    .results-section.visible { display: block; }
+
+    .results-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .total-badge {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .results-meta {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+    }
+
+    .result-row .die-type { color: var(--muted); }
+    .result-row .die-val { font-weight: 700; color: var(--text); }
+    .result-row .die-val.max { color: #ffd700; }
+    .result-row .die-val.min { color: var(--accent2); }
+
+    /* Multi-roll stats */
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .stats-table th {
+      text-align: left;
+      padding: 8px 12px;
+      color: var(--muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stats-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #1e2138;
+    }
+
+    .stats-table tr:last-child td { border-bottom: none; }
+    .stats-table tr:hover td { background: var(--surface2); }
+
+    .highlight { color: var(--accent); font-weight: 700; }
+
+    /* History */
+    .history-list {
+      max-height: 220px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+    }
+
+    .history-item .hist-time { color: var(--muted); font-size: 0.78rem; min-width: 50px; }
+    .history-item .hist-desc { flex: 1; color: var(--muted); }
+    .history-item .hist-total { font-weight: 700; color: var(--accent); }
+
+    .history-empty { color: var(--muted); font-size: 0.9rem; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Dice Roll Simulator</h1>
+    <p class="subtitle">Build your dice pool, then roll.</p>
+
+    <!-- Add Dice -->
+    <div class="card">
+      <div class="card-title">Add Dice</div>
+      <div class="add-dice-row">
+        <button class="preset-btn" onclick="addDie(4)">D4</button>
+        <button class="preset-btn" onclick="addDie(6)">D6</button>
+        <button class="preset-btn" onclick="addDie(8)">D8</button>
+        <button class="preset-btn" onclick="addDie(10)">D10</button>
+        <button class="preset-btn" onclick="addDie(12)">D12</button>
+        <button class="preset-btn" onclick="addDie(20)">D20</button>
+        <button class="preset-btn" onclick="addDie(100)">D100</button>
+        <div class="separator"></div>
+        <div class="custom-row">
+          <label>Custom faces:</label>
+          <input type="number" id="customFaces" min="2" max="1000" value="6" />
+          <button class="btn btn-primary" onclick="addCustomDie()">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dice Tray -->
+    <div class="card">
+      <div class="card-title">Your Dice Pool</div>
+      <div class="dice-tray" id="diceTray">
+        <span class="dice-empty">No dice yet — add some above.</span>
+      </div>
+    </div>
+
+    <!-- Roll Controls -->
+    <div class="card">
+      <div class="card-title">Roll</div>
+      <div class="roll-controls">
+        <button class="btn-roll" id="rollBtn" onclick="rollOnce()">Roll Once</button>
+        <div class="multi-roll-group">
+          <label>Simulate</label>
+          <input type="number" id="multiCount" min="1" max="10000" value="100" style="width:90px" />
+          <label>rolls</label>
+          <button class="btn-multi" id="multiBtn" onclick="rollMulti()">Roll</button>
+        </div>
+        <button class="btn-clear" onclick="clearDice()">Clear All</button>
+      </div>
+    </div>
+
+    <!-- Single Roll Results -->
+    <div class="card results-section" id="singleResults">
+      <div class="card-title">Last Roll</div>
+      <div class="results-header">
+        <div class="total-badge" id="singleTotal">0</div>
+        <div class="results-meta" id="singleMeta"></div>
+      </div>
+      <div class="results-grid" id="singleBreakdown"></div>
+    </div>
+
+    <!-- Multi Roll Results -->
+    <div class="card results-section" id="multiResults">
+      <div class="card-title">Simulation Results</div>
+      <div class="results-header">
+        <div class="results-meta" id="multiMeta"></div>
+      </div>
+      <table class="stats-table">
+        <thead>
+          <tr>
+            <th>Stat</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody id="statsBody"></tbody>
+      </table>
+    </div>
+
+    <!-- History -->
+    <div class="card">
+      <div class="card-title">History</div>
+      <div class="history-list" id="historyList">
+        <span class="history-empty">No rolls yet.</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let dice = []; // { id, faces }
+    let nextId = 1;
+    let history = [];
+
+    function addDie(faces) {
+      dice.push({ id: nextId++, faces });
+      renderTray();
+    }
+
+    function addCustomDie() {
+      const input = document.getElementById('customFaces');
+      const faces = parseInt(input.value);
+      if (!faces || faces < 2) { input.focus(); return; }
+      addDie(faces);
+    }
+
+    function removeDie(id) {
+      dice = dice.filter(d => d.id !== id);
+      renderTray();
+    }
+
+    function clearDice() {
+      dice = [];
+      renderTray();
+      document.getElementById('singleResults').classList.remove('visible');
+      document.getElementById('multiResults').classList.remove('visible');
+    }
+
+    function renderTray() {
+      const tray = document.getElementById('diceTray');
+      if (dice.length === 0) {
+        tray.innerHTML = '<span class="dice-empty">No dice yet — add some above.</span>';
+        return;
+      }
+      tray.innerHTML = dice.map(d => `
+        <div class="die-chip">
+          <div class="die-face" id="die-${d.id}">
+            <span class="die-label">D${d.faces}</span>
+            ?
+          </div>
+          <div class="die-chip-label">D${d.faces}</div>
+          <div class="die-chip-actions">
+            <button class="btn btn-danger" onclick="removeDie(${d.id})">Remove</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function rollDie(faces) {
+      return Math.floor(Math.random() * faces) + 1;
+    }
+
+    function rollOnce() {
+      if (dice.length === 0) return;
+
+      const rollBtn = document.getElementById('rollBtn');
+      rollBtn.disabled = true;
+
+      const results = dice.map(d => ({ ...d, value: rollDie(d.faces) }));
+
+      // Animate dice
+      dice.forEach(d => {
+        const el = document.getElementById(`die-${d.id}`);
+        if (el) {
+          el.classList.remove('rolled');
+          el.classList.add('rolling');
+        }
+      });
+
+      setTimeout(() => {
+        results.forEach(r => {
+          const el = document.getElementById(`die-${r.id}`);
+          if (el) {
+            el.classList.remove('rolling');
+            el.classList.add('rolled');
+            el.innerHTML = `<span class="die-label">D${r.faces}</span>${r.value}`;
+          }
+        });
+
+        const total = results.reduce((s, r) => s + r.value, 0);
+        showSingleResults(results, total);
+        addHistory('single', results, total);
+        rollBtn.disabled = false;
+      }, 500);
+    }
+
+    function showSingleResults(results, total) {
+      const section = document.getElementById('singleResults');
+      section.classList.add('visible');
+
+      document.getElementById('singleTotal').textContent = total;
+      document.getElementById('singleMeta').textContent =
+        `Total of ${results.length} ${results.length === 1 ? 'die' : 'dice'}`;
+
+      const minVal = Math.min(...results.map(r => r.value));
+      const maxVal = Math.max(...results.map(r => r.value));
+
+      document.getElementById('singleBreakdown').innerHTML = results.map(r => {
+        let cls = '';
+        if (r.value === r.faces && results.filter(x => x.value === x.faces).length > 0) cls = 'max';
+        if (r.value === 1) cls = 'min';
+        return `
+          <div class="result-row">
+            <span class="die-type">D${r.faces}</span>
+            <span class="die-val ${cls}">${r.value}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function rollMulti() {
+      if (dice.length === 0) return;
+      const count = parseInt(document.getElementById('multiCount').value);
+      if (!count || count < 1) return;
+
+      const totals = [];
+      for (let i = 0; i < count; i++) {
+        let sum = 0;
+        dice.forEach(d => { sum += rollDie(d.faces); });
+        totals.push(sum);
+      }
+
+      const min = Math.min(...totals);
+      const max = Math.max(...totals);
+      const avg = totals.reduce((a, b) => a + b, 0) / totals.length;
+      const sorted = [...totals].sort((a, b) => a - b);
+      const median = sorted.length % 2 === 0
+        ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
+        : sorted[Math.floor(sorted.length / 2)];
+
+      // Std deviation
+      const variance = totals.reduce((s, v) => s + (v - avg) ** 2, 0) / totals.length;
+      const std = Math.sqrt(variance);
+
+      // Mode
+      const freq = {};
+      totals.forEach(v => { freq[v] = (freq[v] || 0) + 1; });
+      const modeVal = Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0];
+      const modeCount = freq[modeVal];
+
+      // Theoretical min/max
+      const theoryMin = dice.length;
+      const theoryMax = dice.reduce((s, d) => s + d.faces, 0);
+
+      showMultiResults({ count, min, max, avg, median, std, modeVal, modeCount, theoryMin, theoryMax });
+      addHistory('multi', null, null, { count, min, max, avg });
+    }
+
+    function showMultiResults({ count, min, max, avg, median, std, modeVal, modeCount, theoryMin, theoryMax }) {
+      const section = document.getElementById('multiResults');
+      section.classList.add('visible');
+
+      document.getElementById('multiMeta').textContent =
+        `${count.toLocaleString()} simulated rolls with ${dice.length} ${dice.length === 1 ? 'die' : 'dice'}`;
+
+      document.getElementById('statsBody').innerHTML = `
+        <tr><td>Min rolled</td><td class="highlight">${min}</td></tr>
+        <tr><td>Max rolled</td><td class="highlight">${max}</td></tr>
+        <tr><td>Average</td><td class="highlight">${avg.toFixed(2)}</td></tr>
+        <tr><td>Median</td><td class="highlight">${median}</td></tr>
+        <tr><td>Std deviation</td><td class="highlight">${std.toFixed(2)}</td></tr>
+        <tr><td>Most common total</td><td class="highlight">${modeVal} <span style="color:var(--muted);font-weight:400">(${modeCount}x)</span></td></tr>
+        <tr><td>Theoretical min</td><td style="color:var(--muted)">${theoryMin}</td></tr>
+        <tr><td>Theoretical max</td><td style="color:var(--muted)">${theoryMax}</td></tr>
+      `;
+    }
+
+    function addHistory(type, results, total, multiData) {
+      const now = new Date();
+      const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      let desc, val;
+
+      if (type === 'single') {
+        const summary = dice.map(d => `D${d.faces}`).join('+');
+        desc = `Rolled ${summary}`;
+        val = `= ${total}`;
+      } else {
+        const summary = dice.map(d => `D${d.faces}`).join('+');
+        desc = `${multiData.count}x [${summary}]`;
+        val = `avg ${multiData.avg.toFixed(1)}`;
+      }
+
+      history.unshift({ time, desc, val });
+      if (history.length > 20) history.pop();
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const list = document.getElementById('historyList');
+      if (history.length === 0) {
+        list.innerHTML = '<span class="history-empty">No rolls yet.</span>';
+        return;
+      }
+      list.innerHTML = history.map(h => `
+        <div class="history-item">
+          <span class="hist-time">${h.time}</span>
+          <span class="hist-desc">${h.desc}</span>
+          <span class="hist-total">${h.val}</span>
+        </div>
+      `).join('');
+    }
+
+    // Allow Enter on custom faces input
+    document.getElementById('customFaces').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addCustomDie();
+    });
+  </script>
+</body>
+</html>
