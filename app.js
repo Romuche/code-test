@@ -186,7 +186,7 @@ function addHistory(type, results, total, multiData) {
   const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   if (type === 'single') {
-    const breakdown = results.map(r => `<strong>${r.value}</strong>(D${r.faces})`).join(' + ');
+    const breakdown = results.map(r => `<strong>${r.value}</strong> (D${r.faces})`).join(' + ');
     history.unshift({ time, type: 'single', breakdown, total });
   } else {
     const summary = dice.map(d => `D${d.faces}`).join('+');
