@@ -178,6 +178,11 @@ function addHistory(type, results, total, multiData) {
   renderHistory();
 }
 
+function clearHistory() {
+  history = [];
+  renderHistory();
+}
+
 function renderHistory() {
   const list = document.getElementById('historyList');
   if (history.length === 0) {

@@ -83,7 +83,10 @@
 
     <!-- History -->
     <div class="card">
-      <div class="card-title">History</div>
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+        History
+        <button class="btn-clear" onclick="clearHistory()">Clear History</button>
+      </div>
       <div class="history-list" id="historyList">
         <span class="history-empty">No rolls yet.</span>
       </div>
